@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface JKFPSExample : UITableViewController
+@interface JKFPSExample : UIViewController
 
 @end

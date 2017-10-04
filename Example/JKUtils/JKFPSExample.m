@@ -7,9 +7,12 @@
 //
 
 #import "JKFPSExample.h"
+#import "JKFPSLabel.h"
 
-@interface JKFPSExample ()
-
+@interface JKFPSExample ()<UITableViewDataSource>
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) NSMutableArray *data;
+@property (nonatomic, strong) JKFPSLabel *fps;
 @end
 
 @implementation JKFPSExample
@@ -17,82 +20,55 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
+    self.view.backgroundColor = [UIColor darkGrayColor];
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.fps = [[JKFPSLabel alloc] initWithFrame:CGRectMake(0, 80, 80, 30)];
+    CGPoint center = self.fps.center;
+    center.x = self.view.center.x;
+    self.fps.center = center;
+    [self.view addSubview:self.fps];
+    
+    CGFloat y = CGRectGetMaxY(self.fps.frame);
+    CGRect frame = CGRectMake(0, y, self.view.bounds.size.width, self.view.bounds.size.height - y);
+    self.tableView = [[UITableView alloc] initWithFrame:frame];
+    self.tableView.dataSource = self;
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"JK"];
+    [self.view addSubview:self.tableView];
+    
+    self.data = @[].mutableCopy;
+    for (int i = 0; i < 500; i++) {
+        NSString *str = [NSString stringWithFormat:@"%zd    usleep(20000)", i];
+        [self.data addObject:str];
+    }
+    
+    [self.tableView reloadData];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (NSAttributedString *)_create {
+    UIImage *jk = [UIImage imageNamed:@"JK"];
+    NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+    attachment.image = jk;
+    attachment.bounds = CGRectMake(0, 0, 20, 20);
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString attributedStringWithAttachment:attachment] mutableCopy];
+    NSMutableAttributedString *other = [[NSMutableAttributedString alloc] initWithString:@"Just for JKFPSExample" attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}];
+    [other addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:NSMakeRange(@"Just ".length, @"for ".length)];
+    [other addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:NSMakeRange(@"Just for ".length, @"JKFPSExample".length)];
+    [attrStr appendAttributedString:other];
+    
+    return attrStr;
 }
 
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
-}
-
+#pragma mark - table view data source
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
-    return 0;
+    return _data.count;
 }
 
-/*
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
     
-    // Configure the cell...
-    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"JK"];
+    cell.textLabel.text = _data[indexPath.row];
+    usleep(20000);
     return cell;
 }
-*/
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
